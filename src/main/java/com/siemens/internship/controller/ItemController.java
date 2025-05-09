@@ -26,11 +26,11 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<?> createItem(@Valid @RequestBody Item item, BindingResult result) {
+        // Check for validation errors
         if (result.hasErrors()) {
-            // Return BAD_REQUEST if validation fails
             return new ResponseEntity<>(result.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
-        // Return CREATED if the item is successfully saved
+        // If validation passes, save the item and return CREATED status
         return new ResponseEntity<>(itemService.save(item), HttpStatus.CREATED);
     }
 

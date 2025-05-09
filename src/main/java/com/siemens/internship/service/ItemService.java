@@ -20,7 +20,7 @@ public class ItemService {
 
     @Autowired
     @Qualifier("customTaskExecutor") // custom executor
-    private Executor executor; // Use Spring-managed executor for better resource management
+    Executor executor; // Use Spring-managed executor for better resource management
 
     // Asynchronous method to process items
     @Async
