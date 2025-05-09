@@ -1,5 +1,7 @@
-package com.siemens.internship;
+package com.siemens.internship.controller;
 
+import com.siemens.internship.model.Item;
+import com.siemens.internship.service.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -72,6 +74,13 @@ public class ItemController {
 
     @GetMapping("/process")
     public ResponseEntity<List<Item>> processItems() {
-        return new ResponseEntity<>(itemService.processItemsAsync(), HttpStatus.OK);
+        try {
+            // Wait for the CompletableFuture to complete and get the result
+            List<Item> processedItems = itemService.processItemsAsync().get();
+            return new ResponseEntity<>(processedItems, HttpStatus.OK);
+        } catch (Exception e) {
+            // Handle any exceptions that occur during processing
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
