@@ -31,5 +31,6 @@ public class Item {
     // Validates that the email field contains a properly formatted email address.
     // If the format is invalid, a validation message is provided.
     @Email(message = "Invalid email format")
+    @NotBlank(message = "Email is mandatory")
     private String email;
 }

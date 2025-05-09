@@ -25,39 +25,29 @@ public class ItemService {
     // Asynchronous method to process items
     @Async
     public CompletableFuture<List<Item>> processItemsAsync() {
-        // Thread-safe collection to store processed items
         List<Item> processedItems = new CopyOnWriteArrayList<>();
 
-        // Retrieve all item IDs from the database
-        List<Long> itemIds = itemRepository.findAllIds();
+        List<Item> items = itemRepository.findAll(); // evităm query separat pe ID-uri
 
-        // Create a list of CompletableFuture tasks
-        List<CompletableFuture<Void>> futures = itemIds.stream()
-                .map(id -> CompletableFuture.runAsync(() -> {
+        List<CompletableFuture<Void>> futures = items.stream()
+                .map(item -> CompletableFuture.runAsync(() -> {
                     try {
-                        // Retrieve the item by ID
-                        Item item = itemRepository.findById(id).orElse(null);
-                        if (item != null) {
-                            // Update the item's status to "PROCESSED"
+                        // Procesăm doar dacă itemul nu e deja procesat
+                        if (!"PROCESSED".equalsIgnoreCase(item.getStatus())) {
                             item.setStatus("PROCESSED");
-                            // Save the updated item back to the database
-                            itemRepository.save(item);
-                            // Add the item to the processed list
-                            processedItems.add(item);
+                            Item saved = itemRepository.save(item);
+                            processedItems.add(saved);
                         }
                     } catch (Exception e) {
-                        // Log any errors that occur during processing
-                        System.err.println("Error processing item with ID " + id + ": " + e.getMessage());
+                        System.err.println("Error processing item with ID " + item.getId() + ": " + e.getMessage());
                     }
                 }, executor))
                 .toList();
 
-        // Wait for all tasks to complete
-        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-
-        // Return the list of processed items once all tasks are complete
-        return allOf.thenApply(v -> processedItems);
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> processedItems);
     }
+
 
     public List<Item> findAll() {
         return itemRepository.findAll();

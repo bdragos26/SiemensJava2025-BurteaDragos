@@ -41,13 +41,13 @@ class ItemServiceTest {
     @Test
     void testProcessItemsAsync() throws Exception {
         // Mock data
-        List<Long> itemIds = Arrays.asList(1L, 2L);
         Item item1 = new Item(1L, "Item1", "Description1", null, "item1@example.com");
         Item item2 = new Item(2L, "Item2", "Description2", null, "item2@example.com");
+        List<Item> items = Arrays.asList(item1, item2);
 
-        when(itemRepository.findAllIds()).thenReturn(itemIds);
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(item1));
-        when(itemRepository.findById(2L)).thenReturn(Optional.of(item2));
+        // Mock repository behavior
+        when(itemRepository.findAll()).thenReturn(items);
+        when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Call the method
         CompletableFuture<List<Item>> future = itemService.processItemsAsync();
