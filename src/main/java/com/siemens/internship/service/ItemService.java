@@ -27,12 +27,12 @@ public class ItemService {
     public CompletableFuture<List<Item>> processItemsAsync() {
         List<Item> processedItems = new CopyOnWriteArrayList<>();
 
-        List<Item> items = itemRepository.findAll(); // evităm query separat pe ID-uri
+        List<Item> items = itemRepository.findAll(); // we don't need to query on the id's
 
         List<CompletableFuture<Void>> futures = items.stream()
                 .map(item -> CompletableFuture.runAsync(() -> {
                     try {
-                        // Procesăm doar dacă itemul nu e deja procesat
+                        // We process only if the item is not already processed
                         if (!"PROCESSED".equalsIgnoreCase(item.getStatus())) {
                             item.setStatus("PROCESSED");
                             Item saved = itemRepository.save(item);

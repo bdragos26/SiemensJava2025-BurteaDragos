@@ -1,10 +1,11 @@
 package com.siemens.internship;
 
-import com.siemens.internship.controller.ItemController;
-import com.siemens.internship.service.ItemService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+
+import java.util.concurrent.Executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,21 +13,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 class InternshipApplicationTests {
 
 	@Autowired
-	private ItemController itemController;
-
-	@Autowired
-	private ItemService itemService;
-
+	private ApplicationContext applicationContext;
 
 	@Test
 	void testItemControllerBeanLoaded() {
-		// Verifies that the ItemController bean is loaded into the context
-		assertThat(itemController).isNotNull();
+		assertThat(applicationContext.getBean("itemController")).isNotNull();
 	}
 
 	@Test
 	void testItemServiceBeanLoaded() {
-		// Verifies that the ItemService bean is loaded into the context
-		assertThat(itemService).isNotNull();
+		assertThat(applicationContext.getBean("itemService")).isNotNull();
+	}
+
+	@Test
+	void testCustomTaskExecutorBeanLoaded() {
+		Executor executor = (Executor) applicationContext.getBean("customTaskExecutor");
+		assertThat(executor).isNotNull();
+	}
+
+	@Test
+	void testApplicationContextLoads() {
+		assertThat(applicationContext).isNotNull();
 	}
 }
